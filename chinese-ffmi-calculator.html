@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FFMI计算器 - 无脂体重指数计算</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色和字体 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        neutral: '#E5E7EB',
+                        dark: '#1F2937',
+                        warning: '#EF4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .card-shadow {
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            }
+            .input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+            .btn-hover {
+                @apply hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200;
+            }
+        }
+    </style>
+</head>
+<!-- 背景色使用#0437F2（作者喜欢这个颜色） -->
+<body class="bg-[#0437F2] min-h-screen font-sans text-white">
+    <!-- 页面容器 -->
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <!-- 作者信息 -->
+        <div class="text-right text-sm text-blue-100 mb-4">
+            <p>作者: Baixin Guo</p>
+            <p>
+                <a href="https://github.com/" class="hover:text-white transition-colors" target="_blank">
+                    <i class="fa fa-github mr-1"></i>Github: Baixin Guo
+                </a> | 
+                <span><i class="fa fa-weixin mr-1"></i>微信: MaxGBX</span> | 
+                <a href="mailto:gbx1220max@gmail.com" class="hover:text-white transition-colors">
+                    <i class="fa fa-envelope mr-1"></i>邮箱
+                </a> | 
+                <a href="https://linkedin.com/" class="hover:text-white transition-colors" target="_blank">
+                    <i class="fa fa-linkedin mr-1"></i>Linkedin
+                </a>
+            </p>
+        </div>
+        
+        <!-- 标题区域 -->
+        <header class="text-center mb-10">
+            <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold mb-2">
+                <i class="fa fa-balance-scale text-accent mr-3"></i>FFMI计算器
+            </h1>
+            <p class="text-blue-100 text-lg">无脂体重指数 (Fat-Free Mass Index) 计算与评价</p>
+            <div class="w-24 h-1 bg-accent mx-auto mt-4 rounded-full"></div>
+        </header>
+        
+        <!-- 主要内容区 -->
+        <main class="bg-white rounded-2xl card-shadow p-6 md:p-8 text-dark">
+            <!-- 介绍部分 -->
+            <div class="mb-8 text-gray-600">
+                <p class="mb-3">FFMI是评估人体肌肉量的重要指标，比BMI更能反映身体的肌肉发达程度。请输入以下信息进行计算：</p>
+            </div>
+            
+            <!-- 输入表单 -->
+            <form id="ffmiForm" class="space-y-6 mb-8">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- 体重输入 -->
+                    <div>
+                        <label for="weight" class="block text-sm font-medium text-gray-700 mb-1">体重 (kg)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fa fa-balance-scale"></i>
+                            </span>
+                            <input 
+                                type="number" 
+                                id="weight" 
+                                min="30" 
+                                max="200" 
+                                step="0.1" 
+                                required
+                                class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg input-focus"
+                                placeholder="例如：70.5"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- 身高输入 -->
+                    <div>
+                        <label for="height" class="block text-sm font-medium text-gray-700 mb-1">身高 (cm)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fa fa-arrows-v"></i>
+                            </span>
+                            <input 
+                                type="number" 
+                                id="height" 
+                                min="100" 
+                                max="250" 
+                                step="1" 
+                                required
+                                class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg input-focus"
+                                placeholder="例如：175"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- 体脂率输入 -->
+                    <div>
+                        <label for="bodyFat" class="block text-sm font-medium text-gray-700 mb-1">体脂率 (%)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fa fa-percent"></i>
+                            </span>
+                            <input 
+                                type="number" 
+                                id="bodyFat" 
+                                min="3" 
+                                max="50" 
+                                step="0.1" 
+                                required
+                                class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg input-focus"
+                                placeholder="例如：15.5"
+                            >
+                        </div>
+                    </div>
+                    
+                    <!-- 性别选择 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">性别</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="male" checked class="mr-2 h-4 w-4 text-primary">
+                                <span>男性</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="gender" value="female" class="mr-2 h-4 w-4 text-primary">
+                                <span>女性</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 计算按钮 -->
+                <div class="text-center pt-4">
+                    <button 
+                        type="submit" 
+                        class="bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-lg btn-hover w-full md:w-auto"
+                    >
+                        <i class="fa fa-calculator mr-2"></i>计算FFMI
+                    </button>
+                </div>
+            </form>
+            
+            <!-- 结果展示区域 -->
+            <div id="result" class="hidden bg-gray-50 rounded-xl p-6 border border-gray-100">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <i class="fa fa-bar-chart text-accent mr-2"></i>计算结果
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="text-center p-4 bg-white rounded-lg border border-gray-100">
+                        <p class="text-gray-600 mb-1">你的FFMI值</p>
+                        <p id="ffmiValue" class="text-4xl font-bold text-primary">0.0</p>
+                        <p class="text-sm text-gray-600 mt-1">kg/m²</p>
+                    </div>
+                    
+                    <div class="p-4 bg-white rounded-lg border border-gray-100">
+                        <p class="text-gray-600 mb-2">评价</p>
+                        <div id="evaluation" class="text-lg font-medium"></div>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="font-medium mb-2">参考范围（自然训练状态）</h3>
+                    <div class="grid md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <p class="font-medium">男性:</p>
+                            <ul class="list-disc list-inside text-gray-600 pl-2 space-y-1">
+                                <li>普通: 18.0 - 22.0 kg/m²</li>
+                                <li>良好: 22.0 - 24.0 kg/m²</li>
+                                <li>优秀: 24.0 - 26.0 kg/m²</li>
+                                <li class="text-warning">超高: > 26.0 kg/m²（罕见，可能与药物相关）</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p class="font-medium">女性:</p>
+                            <ul class="list-disc list-inside text-gray-600 pl-2 space-y-1">
+                                <li>普通: 16.0 - 19.0 kg/m²</li>
+                                <li>良好: 19.0 - 21.0 kg/m²</li>
+                                <li>优秀: 21.0 - 23.0 kg/m²</li>
+                                <li class="text-warning">超高: > 23.0 kg/m²（罕见，可能与药物相关）</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-yellow-50 border border-yellow-100 rounded-lg text-sm text-yellow-800">
+                        <i class="fa fa-exclamation-triangle mr-1"></i>
+                        <strong>说明:</strong> 自然训练情况下，男性FFMI超过26、女性超过23非常罕见。专业运动员或使用性能增强物质可能达到更高水平。
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- 页脚 -->
+        <footer class="mt-10 text-center text-blue-100 text-sm">
+            <p>FFMI (无脂体重指数) 是评估肌肉量的有效指标，结果仅供参考，不构成医疗建议</p>
+        </footer>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const form = document.getElementById('ffmiForm');
+        const result = document.getElementById('result');
+        const ffmiValue = document.getElementById('ffmiValue');
+        const evaluation = document.getElementById('evaluation');
+        
+        // 表单提交事件处理
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取输入值
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value) / 100; // 转换为米
+            const bodyFat = parseFloat(document.getElementById('bodyFat').value);
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            
+            // 计算无脂体重
+            const fatFreeMass = weight * (1 - bodyFat / 100);
+            
+            // 计算FFMI
+            const ffmi = fatFreeMass / (height * height);
+            
+            // 显示结果
+            displayResult(ffmi, gender);
+        });
+        
+        // 显示计算结果和评价（风趣版）
+        function displayResult(ffmi, gender) {
+            // 保留一位小数
+            const ffmiRounded = ffmi.toFixed(1);
+            ffmiValue.textContent = ffmiRounded;
+            
+            // 根据性别和FFMI值生成风趣评价
+            let evalText = '';
+            let evalClass = '';
+            
+            if (gender === 'male') {
+                if (ffmi < 18.0) {
+                    evalText = '兄弟，你这肌肉量有点堪忧啊...是不是该放下奶茶走进健身房了？';
+                    evalClass = 'text-neutral';
+                } else if (ffmi < 20.0) {
+                    evalText = '哥们有点儿细啊，加油练！多吃点蛋白质，别总熬夜打游戏了';
+                    evalClass = 'text-neutral';
+                } else if (ffmi < 22.0) {
+                    evalText = '很可以了啊哥们，练得不错！继续保持，已经超过平均水平了';
+                    evalClass = 'text-secondary';
+                } else if (ffmi < 24.0) {
+                    evalText = '牛啊大哥！请受作者一拜！接近自然极限了，健身房的焦点就是你吧';
+                    evalClass = 'text-accent';
+                } else if (ffmi < 26.0) {
+                    evalText = '大佬！这是自然健身的佼佼者啊！是不是每天除了练就是吃？太顶了！';
+                    evalClass = 'text-primary';
+                } else {
+                    evalText = '跟我说实话，你是数据填错了还是九龙拉棺扎针了？这水平太夸张了吧！';
+                    evalClass = 'text-warning';
+                }
+            } else { // 女性
+                if (ffmi < 16.0) {
+                    evalText = '姐妹，肌肉量有点少哦，适当做点力量训练，对身材和健康都好呀';
+                    evalClass = 'text-neutral';
+                } else if (ffmi < 17.5) {
+                    evalText = '不错哦，但还有提升空间！别害怕力量训练，不会变成肌肉女的';
+                    evalClass = 'text-neutral';
+                } else if (ffmi < 19.0) {
+                    evalText = '可以啊姐妹！线条一定很好看，继续保持这股劲儿！';
+                    evalClass = 'text-secondary';
+                } else if (ffmi < 21.0) {
+                    evalText = '太厉害了！这肌肉量在女生里相当优秀了，一定付出了很多汗水吧';
+                    evalClass = 'text-accent';
+                } else if (ffmi < 23.0) {
+                    evalText = '女王级别的肌肉量！太令人佩服了，这是多少女生的梦想啊！';
+                    evalClass = 'text-primary';
+                } else {
+                    evalText = '这数据...确定没填错吗？女生能达到这水平，简直是天赋异禀啊！';
+                    evalClass = 'text-warning';
+                }
+            }
+            
+            evaluation.textContent = evalText;
+            evaluation.className = evalClass;
+            
+            // 显示结果区域并添加动画效果
+            result.classList.remove('hidden');
+            result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+</body>
+</html>
